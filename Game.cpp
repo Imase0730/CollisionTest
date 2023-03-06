@@ -37,6 +37,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
+    m_camera = std::make_unique<DebugCamera>(800, 600);
 }
 
 #pragma region Frame Update
@@ -58,6 +59,8 @@ void Game::Update(DX::StepTimer const& timer)
 
     // TODO: Add your game logic here.
     elapsedTime;
+
+    m_camera->Update();
 }
 #pragma endregion
 
@@ -81,7 +84,8 @@ void Game::Render()
 
     SimpleMath::Matrix world, view, proj;
 
-    view = SimpleMath::Matrix::CreateLookAt(SimpleMath::Vector3(0.0f, 10.0f, 10.0f), SimpleMath::Vector3(0.0f, 0.0f, 0.0f), SimpleMath::Vector3::UnitY);
+ //   view = SimpleMath::Matrix::CreateLookAt(SimpleMath::Vector3(0.0f, 1.0f, 10.0f), SimpleMath::Vector3(0.0f, 0.0f, 0.0f), SimpleMath::Vector3::UnitY);
+    view = m_camera->GetCameraMatrix();
     proj = SimpleMath::Matrix::CreatePerspectiveFieldOfView(XMConvertToRadians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
     m_floorModel->Draw(context, *m_states.get(), world, view, proj, false, [&]()
@@ -90,6 +94,8 @@ void Game::Render()
             context->PSSetSamplers(0, 1, samplers);
         }
     );
+
+    m_collision->DrawCollision(context, m_states.get(), view, proj);
 
     m_deviceResources->PIXEndEvent();
 
@@ -185,6 +191,14 @@ void Game::CreateDeviceDependentResources()
     m_effectFactory = std::make_unique<EffectFactory>(device);
     m_floorModel = Model::CreateFromCMO(device, L"Resources/floor.cmo", *m_effectFactory.get());
     m_states = std::make_unique<CommonStates>(device);
+
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    m_collision = std::make_unique<DisplayCollision>(device, context);
+
+    float angle = XMConvertToRadians(30.0f);
+    SimpleMath::Quaternion q = SimpleMath::Quaternion::CreateFromYawPitchRoll(angle,0, 0);
+
+    m_collision->AddColiision(SimpleMath::Vector3(0, 0, 0), 3, q);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

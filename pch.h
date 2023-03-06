@@ -91,3 +91,5 @@ namespace DX
 #include "PrimitiveBatch.h"
 #include "VertexTypes.h"
 #include "DirectXHelpers.h"
+#include "Mouse.h"
+

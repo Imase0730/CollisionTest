@@ -31,10 +31,13 @@ private:
 	// 球を描画する関数
 	void DrawSphere(DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* primitiveBatch, const CollisionSphere& sphere);
 
+	std::unique_ptr<DirectX::DGSLEffectFactory> m_effectFactory;
+	std::unique_ptr<DirectX::Model> m_model;
+
 public:
 
 	// コンストラクタ
-	DisplayCollision(ID3D11Device* device);
+	DisplayCollision(ID3D11Device* device, ID3D11DeviceContext* context);
 
 	// コリジョンを描画する関数
 	void DrawCollision(
@@ -43,5 +46,7 @@ public:
 		const DirectX::SimpleMath::Matrix& view,
 		const DirectX::SimpleMath::Matrix& proj);
 		
+	void AddColiision(DirectX::SimpleMath::Vector3 center, float radius, DirectX::SimpleMath::Quaternion rotate);
+
 };
 

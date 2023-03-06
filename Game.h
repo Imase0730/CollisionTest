@@ -6,7 +6,8 @@
 
 #include "DeviceResources.h"
 #include "StepTimer.h"
-
+#include "DisplayCollision.h"
+#include "DebugCamera.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -66,5 +67,9 @@ private:
     std::unique_ptr<DirectX::CommonStates> m_states;
     std::unique_ptr<DirectX::Model> m_floorModel;
     std::unique_ptr<DirectX::EffectFactory> m_effectFactory;
+
+    std::unique_ptr<DisplayCollision> m_collision;
+
+    std::unique_ptr<DebugCamera> m_camera;
 
 };
