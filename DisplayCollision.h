@@ -3,12 +3,23 @@
 //
 // コリジョン表示クラス（デバッグ用）
 //
+// Usage: AddBoundingSphereとAddBoundingBoxで登録してください。
+//        DrawCollision関数で表示します。登録された情報は描画後クリアされます。
+//        モデル情報の衝突判定用のコリジョン情報の表示などに使用してください。
+//        ボックスは回転には対応していません。（AABBの衝突判定用）
+//
 // Date: 2023.3.8
 // Author: Hideyasu Imase
+//
 //--------------------------------------------------------------------------------------
 #pragma once
 
 #include <vector>
+#include "SimpleMath.h"
+#include "CommonStates.h"
+#include "Effects.h"
+#include "GeometricPrimitive.h"
+#include "DirectXHelpers.h"
 
 namespace Imase
 {
@@ -22,7 +33,9 @@ namespace Imase
 		{
 			DirectX::SimpleMath::Vector3 center;	// 中心
 			float radius;							// 半径
-			DirectX::SimpleMath::Quaternion rotate;	// 回転
+
+			constexpr Sphere(const DirectX::SimpleMath::Vector3& center, float radius) noexcept
+				: center(center), radius(radius) {}
 		};
 
 		// ボックスの情報
@@ -30,6 +43,9 @@ namespace Imase
 		{
 			DirectX::SimpleMath::Vector3 center;	// 中心
 			DirectX::SimpleMath::Vector3 extents;	// 各面の中心からの距離.
+
+			constexpr Box(const DirectX::SimpleMath::Vector3& center, const DirectX::SimpleMath::Vector3& extents) noexcept
+				: center(center), extents(extents) {}
 		};
 
 		// 表示可能なコリジョンの最大数
@@ -40,15 +56,6 @@ namespace Imase
 
 		// ボックスのコリジョン情報
 		std::vector<Box> m_boxes;
-
-		// プリミティブバッチ
-		std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_primitiveBatch;
-
-		// エフェクト（ライン用）
-		std::unique_ptr<DirectX::BasicEffect> m_lineEffect;
-
-		// 入力レイアウト（ライン用）
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_lineInputLayout;
 
 		// 球のモデル
 		std::unique_ptr<DirectX::GeometricPrimitive> m_modelSphere;
@@ -65,14 +72,6 @@ namespace Imase
 		// インスタンス用頂点バッファ
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_instancedVB;
 
-	private:
-
-		// 球のラインを描画する関数
-		void DrawSphereLine(
-			DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* primitiveBatch,
-			const Sphere& sphere
-		);
-
 	public:
 
 		// コンストラクタ
@@ -84,25 +83,23 @@ namespace Imase
 			DirectX::CommonStates* states,
 			const DirectX::SimpleMath::Matrix& view,
 			const DirectX::SimpleMath::Matrix& proj,
-			DirectX::SimpleMath::Color modelColor = DirectX::SimpleMath::Color(1.0f,1.0f,1.0f,0.5f)
+			DirectX::SimpleMath::Color color = DirectX::SimpleMath::Color(1.0f,1.0f,1.0f,0.5f)
 		);
 		
 		// 球のコリジョンを登録する関数
-		void AddSphereCollision(
-			DirectX::BoundingSphere shpere,
-			DirectX::SimpleMath::Quaternion rotate = DirectX::SimpleMath::Quaternion::Identity
-		)
+		void AddBoundingSphere(DirectX::BoundingSphere shpere, DirectX::SimpleMath::Vector3 pos)
 		{
-			Sphere data = { shpere.Center, shpere.Radius, rotate };
-			m_spheres.push_back(data);
+			DirectX::XMFLOAT3 center = shpere.Center + pos;
+			m_spheres.push_back(Sphere(center, shpere.Radius));
 		}
 
 		// ボックスのコリジョンを登録する関数
-		void AddBoxCollision(DirectX::BoundingBox box)
+		void AddBoundingBox(DirectX::BoundingBox box, DirectX::SimpleMath::Vector3 pos)
 		{
-			Box data = { box.Center, box.Extents };
-			m_boxes.push_back(data);
+			DirectX::XMFLOAT3 center = box.Center + pos;
+			m_boxes.push_back(Box(center, box.Extents));
 		}
+
 	};
 
 }

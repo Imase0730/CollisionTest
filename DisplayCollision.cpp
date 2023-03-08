@@ -12,64 +12,6 @@
 using namespace DirectX;
 using namespace Imase;
 
-// 球のラインを描画する関数
-void DisplayCollision::DrawSphereLine(
-	PrimitiveBatch<VertexPositionColor>* primitiveBatch,
-	const Sphere& sphere)
-{
-	int vertices = 16;
-
-	VertexPositionColor* v = new VertexPositionColor[vertices * 2 * 3];
-	float centralAngle = XM_2PI / static_cast<float>(vertices);
-	float angle_a = 0.0f;
-	SimpleMath::Color color;
-	SimpleMath::Vector3 pos[2];
-
-	// 高速化のため頂点情報をまとめて描画している
-	for (int i = 0; i < vertices; i++)
-	{
-		// 始点と終点のコサインとサインを先に計算しておく
-		float angle_b = angle_a + centralAngle;
-		float cos_a = cosf(angle_a);
-		float sin_a = sinf(angle_a);
-		float cos_b = cosf(angle_b);
-		float sin_b = sinf(angle_b);
-
-		for (int j = 0; j < 3; j++)
-		{
-			switch (j)
-			{
-			case 0:		// Roll
-				color = Colors::GreenYellow;
-				pos[0] = SimpleMath::Vector3(cos_a, sin_a, 0.0f);
-				pos[1] = SimpleMath::Vector3(cos_b, sin_b, 0.0f);
-				break;
-			case 1:		// Pitch
-				color = Colors::OrangeRed;
-				pos[0] = SimpleMath::Vector3(0.0f, sin_a, cos_a);
-				pos[1] = SimpleMath::Vector3(0.0f, sin_b, cos_b);
-				break;
-			default:	// Yaw
-				color = Colors::Blue;
-				pos[0] = SimpleMath::Vector3(cos_a, 0.0f, sin_a);
-				pos[1] = SimpleMath::Vector3(cos_b, 0.0f, sin_b);
-				break;
-			}
-			SimpleMath::Vector3::Transform(pos[0], sphere.rotate, pos[0]);
-			v[i * 6 + j * 2] = VertexPositionColor(pos[0] * sphere.radius + sphere.center, color);
-			SimpleMath::Vector3::Transform(pos[1], sphere.rotate, pos[1]);
-			v[i * 6 + j * 2 + 1] = VertexPositionColor(pos[1] * sphere.radius + sphere.center, color);
-		}
-
-		angle_a = angle_b;
-	}
-
-	// 線を描画
-	primitiveBatch->Draw(D3D11_PRIMITIVE_TOPOLOGY_LINELIST, v, vertices * 2 * 3);
-
-	delete[] v;
-}
-
 // コンストラクタ
 DisplayCollision::DisplayCollision(ID3D11Device* device, ID3D11DeviceContext* context)
 {
@@ -78,9 +20,6 @@ DisplayCollision::DisplayCollision(ID3D11Device* device, ID3D11DeviceContext* co
 
 	// モデルの作成（ボックス）
 	m_modelBox = GeometricPrimitive::CreateCube(context);
-
-	// プリミティブバッチの作成（ライン用）
-	m_primitiveBatch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
 
 	// ----- エフェクト ----- //
 
@@ -94,13 +33,6 @@ DisplayCollision::DisplayCollision(ID3D11Device* device, ID3D11DeviceContext* co
 	m_modelEffect->DisableSpecular();
 	m_modelEffect->EnableDefaultLighting();
 	m_modelEffect->SetWorld(SimpleMath::Matrix::Identity);
-
-	// エフェクトの作成（ライン用）
-	m_lineEffect = std::make_unique<BasicEffect>(device);
-	m_lineEffect->SetLightingEnabled(false);
-	m_lineEffect->SetTextureEnabled(false);
-	m_lineEffect->SetVertexColorEnabled(true);
-	m_lineEffect->SetWorld(SimpleMath::Matrix::Identity);
 
 	// ----- 入力レイアウト ----- //
 
@@ -118,12 +50,6 @@ DisplayCollision::DisplayCollision(ID3D11Device* device, ID3D11DeviceContext* co
 		CreateInputLayoutFromEffect(device, m_modelEffect.get(),
 			c_InputElements, std::size(c_InputElements),
 			m_modelInputLayout.ReleaseAndGetAddressOf())
-	);
-
-	// 入力レイアウトの作成（ライン用）
-	DX::ThrowIfFailed(
-		CreateInputLayoutFromEffect<VertexPositionColor>(device, m_lineEffect.get(),
-			m_lineInputLayout.ReleaseAndGetAddressOf())
 	);
 
 	// ----- 定数バッファ ----- //
@@ -147,7 +73,7 @@ void DisplayCollision::DrawCollision(
 	CommonStates* states,
 	const SimpleMath::Matrix& view,
 	const SimpleMath::Matrix& proj,
-	DirectX::SimpleMath::Color modelColor)
+	DirectX::SimpleMath::Color color)
 {
 	// 登録数が最大表示数を超えていないか？
 	assert(static_cast<uint32_t>(m_spheres.size()) < DISPLAY_COLLISION_MAX);
@@ -156,7 +82,7 @@ void DisplayCollision::DrawCollision(
 	// ----- 球のモデルを描画 ----- //
 
 	// エフェクトを適応する
-	m_modelEffect->SetColorAndAlpha(modelColor);
+	m_modelEffect->SetColorAndAlpha(color);
 	m_modelEffect->SetView(view);
 	m_modelEffect->SetProjection(proj);
 	m_modelEffect->Apply(context);
@@ -220,27 +146,6 @@ void DisplayCollision::DrawCollision(
 			context->IASetVertexBuffers(1, 1, m_instancedVB.GetAddressOf(), &stride, &offset);
 		}
 	);
-
-	// ----- ラインの描画 ----- //
-	context->OMSetBlendState(states->Opaque(), nullptr, 0xffffffff);
-	context->OMSetDepthStencilState(states->DepthRead(), 0);
-	context->RSSetState(states->CullNone());
-
-	// エフェクトを適応する
-	m_lineEffect->SetView(view);
-	m_lineEffect->SetProjection(proj);
-	m_lineEffect->Apply(context);
-
-	// 入力レイアウトの設定
-	context->IASetInputLayout(m_lineInputLayout.Get());
-
-	// 球のラインを描画する
-	m_primitiveBatch->Begin();
-	for (size_t i = 0; i < m_spheres.size(); i++)
-	{
-		DrawSphereLine(m_primitiveBatch.get(), m_spheres[i]);
-	}
-	m_primitiveBatch->End();
 
 	// 登録された表示情報をクリアする
 	m_spheres.clear();

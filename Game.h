@@ -74,4 +74,6 @@ private:
 
     std::unique_ptr<DirectX::Model> m_monkeyModel;
 
+    DirectX::SimpleMath::Vector3 m_pos;
+
 };

@@ -60,16 +60,29 @@ void Game::Update(DX::StepTimer const& timer)
     // TODO: Add your game logic here.
     elapsedTime;
 
-    float angle = XMConvertToRadians(float(timer.GetTotalSeconds()) * 10.0f);
-    SimpleMath::Quaternion q = SimpleMath::Quaternion::CreateFromYawPitchRoll(0, 0, angle);
+    m_pos = SimpleMath::Vector3(2, 0, 0);
 
-    //m_collision->AddSphereCollision(SimpleMath::Vector3(0, 0, 0), 1, q);
-    //m_collision->AddSphereCollision(SimpleMath::Vector3(0, 1, 1), 1);
- 
+    SimpleMath::Matrix world;
+
     for (size_t i = 0; i < m_monkeyModel->meshes.size(); i++)
     {
-//        m_collision->AddSphereCollision(m_monkeyModel->meshes[i]->boundingSphere);
-        m_collision->AddBoxCollision(m_monkeyModel->meshes[i]->boundingBox);
+        //DirectX::BoundingSphere sphere = m_monkeyModel->meshes[i]->boundingSphere;
+
+        //world = SimpleMath::Matrix::CreateTranslation(m_pos);
+        //XMVECTOR center = XMLoadFloat3(&sphere.Center);
+        //center = XMVector3Transform(center, world);
+        //XMStoreFloat3(&sphere.Center, center);
+
+        m_collision->AddBoundingSphere(m_monkeyModel->meshes[i]->boundingSphere, m_pos);
+        m_collision->AddBoundingBox(m_monkeyModel->meshes[i]->boundingBox, m_pos);
+
+
+ /*       DirectX::BoundingBox box = m_monkeyModel->meshes[i]->boundingBox;
+        world = SimpleMath::Matrix::CreateTranslation(m_pos);
+        XMVECTOR center = XMLoadFloat3(&box.Center);
+        center = XMVector3Transform(center, world);
+        XMStoreFloat3(&box.Center, center);
+        m_collision->AddBoxCollision(box);*/
     }
 
     m_camera->Update();
@@ -107,7 +120,7 @@ void Game::Render()
         }
     );
 
-
+    world = SimpleMath::Matrix::CreateTranslation(m_pos);
     m_monkeyModel->Draw(context, *m_states.get(), world, view, proj);
 
     m_collision->DrawCollision(context, m_states.get(), view, proj);
