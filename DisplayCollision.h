@@ -28,6 +28,9 @@ namespace Imase
 	{
 	private:
 
+		// 表示可能なコリジョンの最大数
+		static const uint32_t DISPLAY_COLLISION_MAX = 100;
+
 		// 球の情報
 		struct Sphere
 		{
@@ -47,9 +50,6 @@ namespace Imase
 			constexpr Box(const DirectX::SimpleMath::Vector3& center, const DirectX::SimpleMath::Vector3& extents) noexcept
 				: center(center), extents(extents) {}
 		};
-
-		// 表示可能なコリジョンの最大数
-		static const uint32_t DISPLAY_COLLISION_MAX = 100;
 
 		// 球のコリジョン情報
 		std::vector<Sphere> m_spheres;
