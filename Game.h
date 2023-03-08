@@ -66,10 +66,12 @@ private:
 
     std::unique_ptr<DirectX::CommonStates> m_states;
     std::unique_ptr<DirectX::Model> m_floorModel;
-    std::unique_ptr<DirectX::EffectFactory> m_effectFactory;
+    std::unique_ptr<DirectX::EffectFactory> m_EffectFactory;
 
-    std::unique_ptr<DisplayCollision> m_collision;
+    std::unique_ptr<Imase::DisplayCollision> m_collision;
 
     std::unique_ptr<DebugCamera> m_camera;
+
+    std::unique_ptr<DirectX::Model> m_monkeyModel;
 
 };

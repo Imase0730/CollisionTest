@@ -49,13 +49,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Shader.dgsl" />
   </ItemGroup>
   <ItemGroup>
     <MeshContentTask Include="FBX\floor.fbx">
       <Filter>FBX</Filter>
     </MeshContentTask>
-    <MeshContentTask Include="FBX\CollisionSphere.fbx">
+    <MeshContentTask Include="FBX\monkey.fbx">
       <Filter>FBX</Filter>
     </MeshContentTask>
   </ItemGroup>

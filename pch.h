@@ -92,4 +92,5 @@ namespace DX
 #include "VertexTypes.h"
 #include "DirectXHelpers.h"
 #include "Mouse.h"
+#include "GeometricPrimitive.h"
 

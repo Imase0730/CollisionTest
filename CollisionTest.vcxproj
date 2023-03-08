@@ -213,11 +213,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Shader.dgsl" />
   </ItemGroup>
   <ItemGroup>
-    <MeshContentTask Include="FBX\CollisionSphere.fbx" />
     <MeshContentTask Include="FBX\floor.fbx" />
+    <MeshContentTask Include="FBX\monkey.fbx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

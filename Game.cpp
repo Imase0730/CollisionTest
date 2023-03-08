@@ -60,6 +60,18 @@ void Game::Update(DX::StepTimer const& timer)
     // TODO: Add your game logic here.
     elapsedTime;
 
+    float angle = XMConvertToRadians(float(timer.GetTotalSeconds()) * 10.0f);
+    SimpleMath::Quaternion q = SimpleMath::Quaternion::CreateFromYawPitchRoll(0, 0, angle);
+
+    //m_collision->AddSphereCollision(SimpleMath::Vector3(0, 0, 0), 1, q);
+    //m_collision->AddSphereCollision(SimpleMath::Vector3(0, 1, 1), 1);
+ 
+    for (size_t i = 0; i < m_monkeyModel->meshes.size(); i++)
+    {
+//        m_collision->AddSphereCollision(m_monkeyModel->meshes[i]->boundingSphere);
+        m_collision->AddBoxCollision(m_monkeyModel->meshes[i]->boundingBox);
+    }
+
     m_camera->Update();
 }
 #pragma endregion
@@ -94,6 +106,9 @@ void Game::Render()
             context->PSSetSamplers(0, 1, samplers);
         }
     );
+
+
+    m_monkeyModel->Draw(context, *m_states.get(), world, view, proj);
 
     m_collision->DrawCollision(context, m_states.get(), view, proj);
 
@@ -188,17 +203,14 @@ void Game::CreateDeviceDependentResources()
     // TODO: Initialize device dependent objects here (independent of window size).
     device;
 
-    m_effectFactory = std::make_unique<EffectFactory>(device);
-    m_floorModel = Model::CreateFromCMO(device, L"Resources/floor.cmo", *m_effectFactory.get());
+    m_EffectFactory = std::make_unique<EffectFactory>(device);
+    m_floorModel = Model::CreateFromCMO(device, L"Resources/floor.cmo", *m_EffectFactory.get());
     m_states = std::make_unique<CommonStates>(device);
 
+    m_monkeyModel = Model::CreateFromCMO(device, L"Resources/monkey.cmo", *m_EffectFactory.get());
+
     auto context = m_deviceResources->GetD3DDeviceContext();
-    m_collision = std::make_unique<DisplayCollision>(device, context);
-
-    float angle = XMConvertToRadians(30.0f);
-    SimpleMath::Quaternion q = SimpleMath::Quaternion::CreateFromYawPitchRoll(angle,0, 0);
-
-    m_collision->AddColiision(SimpleMath::Vector3(0, 0, 0), 3, q);
+    m_collision = std::make_unique<Imase::DisplayCollision>(device, context);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
