@@ -23,6 +23,8 @@
     </ClInclude>
     <ClInclude Include="DisplayCollision.h" />
     <ClInclude Include="DebugCamera.h" />
+    <ClInclude Include="TaskManager.h" />
+    <ClInclude Include="DebugFont.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -33,6 +35,8 @@
     </ClCompile>
     <ClCompile Include="DisplayCollision.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
+    <ClCompile Include="TaskManager.cpp" />
+    <ClCompile Include="DebugFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -57,5 +61,13 @@
     <MeshContentTask Include="FBX\monkey.fbx">
       <Filter>FBX</Filter>
     </MeshContentTask>
+    <MeshContentTask Include="FBX\Shield.fbx">
+      <Filter>FBX</Filter>
+    </MeshContentTask>
+  </ItemGroup>
+  <ItemGroup>
+    <ShaderGraphContentTask Include="FBX\ShieldShader.dgsl">
+      <Filter>FBX</Filter>
+    </ShaderGraphContentTask>
   </ItemGroup>
 </Project>

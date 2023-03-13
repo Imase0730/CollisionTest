@@ -84,13 +84,10 @@ namespace DX
     }
 }
 
+#include "Mouse.h"
+#include "SimpleMath.h"
 #include "Model.h"
 #include "Effects.h"
-#include "SimpleMath.h"
 #include "CommonStates.h"
-#include "PrimitiveBatch.h"
-#include "VertexTypes.h"
 #include "DirectXHelpers.h"
-#include "Mouse.h"
-#include "GeometricPrimitive.h"
 

@@ -37,7 +37,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
-    m_camera = std::make_unique<DebugCamera>(800, 600);
+    m_camera = std::make_unique<Imase::DebugCamera>(800, 600);
 }
 
 #pragma region Frame Update
@@ -64,26 +64,36 @@ void Game::Update(DX::StepTimer const& timer)
 
     SimpleMath::Matrix world;
 
-    for (size_t i = 0; i < m_monkeyModel->meshes.size(); i++)
+ //   for (size_t i = 0; i < m_monkeyModel->meshes.size(); i++)
+ //   {
+ //       //DirectX::BoundingSphere sphere = m_monkeyModel->meshes[i]->boundingSphere;
+
+ //       //world = SimpleMath::Matrix::CreateTranslation(m_pos);
+ //       //XMVECTOR center = XMLoadFloat3(&sphere.Center);
+ //       //center = XMVector3Transform(center, world);
+ //       //XMStoreFloat3(&sphere.Center, center);
+
+ //       m_collision->AddBoundingSphere(m_monkeyModel->meshes[i]->boundingSphere, m_pos);
+ //       m_collision->AddBoundingBox(m_monkeyModel->meshes[i]->boundingBox, m_pos);
+
+
+ ///*       DirectX::BoundingBox box = m_monkeyModel->meshes[i]->boundingBox;
+ //       world = SimpleMath::Matrix::CreateTranslation(m_pos);
+ //       XMVECTOR center = XMLoadFloat3(&box.Center);
+ //       center = XMVector3Transform(center, world);
+ //       XMStoreFloat3(&box.Center, center);
+ //       m_collision->AddBoxCollision(box);*/
+ //   }
+
+  /*  for (size_t i = 0; i < m_shieldModel->meshes.size(); i++)
     {
-        //DirectX::BoundingSphere sphere = m_monkeyModel->meshes[i]->boundingSphere;
+        m_collision->AddBoundingBox(m_shieldModel->meshes[i]->boundingBox, SimpleMath::Vector3(0, 0, 0));
+    }*/
+    BoundingSphere s = { XMFLOAT3(0,0,0), 1.0f };
+    m_collision->AddBoundingSphere(s, SimpleMath::Vector3::Zero);
 
-        //world = SimpleMath::Matrix::CreateTranslation(m_pos);
-        //XMVECTOR center = XMLoadFloat3(&sphere.Center);
-        //center = XMVector3Transform(center, world);
-        //XMStoreFloat3(&sphere.Center, center);
-
-        m_collision->AddBoundingSphere(m_monkeyModel->meshes[i]->boundingSphere, m_pos);
-        m_collision->AddBoundingBox(m_monkeyModel->meshes[i]->boundingBox, m_pos);
-
-
- /*       DirectX::BoundingBox box = m_monkeyModel->meshes[i]->boundingBox;
-        world = SimpleMath::Matrix::CreateTranslation(m_pos);
-        XMVECTOR center = XMLoadFloat3(&box.Center);
-        center = XMVector3Transform(center, world);
-        XMStoreFloat3(&box.Center, center);
-        m_collision->AddBoxCollision(box);*/
-    }
+    m_font3D->AddString(L"IMASE", SimpleMath::Vector3(0, 1, 0), Colors::Black, 0.5f);
+    m_font->AddString(L"IMASE", SimpleMath::Vector2(0, 0), Colors::Black);
 
     m_camera->Update();
 }
@@ -120,10 +130,18 @@ void Game::Render()
         }
     );
 
-    world = SimpleMath::Matrix::CreateTranslation(m_pos);
-    m_monkeyModel->Draw(context, *m_states.get(), world, view, proj);
+    //world = SimpleMath::Matrix::CreateTranslation(m_pos);
+    //m_monkeyModel->Draw(context, *m_states.get(), world, view, proj);
+
+
+    //world = SimpleMath::Matrix::Identity;
+    //m_shieldModel->Draw(context, *m_states.get(), world, view, proj);
+
 
     m_collision->DrawCollision(context, m_states.get(), view, proj);
+
+    m_font3D->Render(context, m_states.get(), view, proj);
+    m_font->Render(m_states.get());
 
     m_deviceResources->PIXEndEvent();
 
@@ -216,14 +234,23 @@ void Game::CreateDeviceDependentResources()
     // TODO: Initialize device dependent objects here (independent of window size).
     device;
 
+    m_states = std::make_unique<CommonStates>(device);
+
     m_EffectFactory = std::make_unique<EffectFactory>(device);
     m_floorModel = Model::CreateFromCMO(device, L"Resources/floor.cmo", *m_EffectFactory.get());
-    m_states = std::make_unique<CommonStates>(device);
 
     m_monkeyModel = Model::CreateFromCMO(device, L"Resources/monkey.cmo", *m_EffectFactory.get());
 
+
+    m_DGSLEffectFactory = std::make_unique<DGSLEffectFactory>(device);
+    m_shieldModel = Model::CreateFromCMO(device, L"Resources/Shield.cmo", *m_DGSLEffectFactory.get());
+
+
     auto context = m_deviceResources->GetD3DDeviceContext();
     m_collision = std::make_unique<Imase::DisplayCollision>(device, context);
+
+    m_font = std::make_unique<Imase::DebugFont>(device, context, L"Resources/SegoeUI_18.spritefont");
+    m_font3D = std::make_unique<Imase::DebugFont3D>(device, context, L"Resources/SegoeUI_18.spritefont");
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

@@ -8,9 +8,10 @@
 //--------------------------------------------------------------------------------------
 #include "pch.h"
 #include "DebugCamera.h"
+#include "Mouse.h"
 
 using namespace DirectX;
-using namespace DirectX::SimpleMath;
+using namespace Imase;
 
 const float DebugCamera::DEFAULT_CAMERA_DISTANCE = 5.0f;
 
@@ -63,23 +64,23 @@ void DebugCamera::Update()
 	}
 
 	// ビュー行列を算出する
-	Matrix rotY = Matrix::CreateRotationY(m_yTmp);
-	Matrix rotX = Matrix::CreateRotationX(m_xTmp);
+	SimpleMath::Matrix rotY = SimpleMath::Matrix::CreateRotationY(m_yTmp);
+	SimpleMath::Matrix rotX = SimpleMath::Matrix::CreateRotationX(m_xTmp);
 
-	Matrix rt = rotY * rotX;
+	SimpleMath::Matrix rt = rotY * rotX;
 
-	Vector3 eye(0.0f, 0.0f, 1.0f);
-	Vector3 target(0.0f, 0.0f, 0.0f);
-	Vector3 up(0.0f, 1.0f, 0.0f);
+	SimpleMath::Vector3 eye(0.0f, 0.0f, 1.0f);
+	SimpleMath::Vector3 target(0.0f, 0.0f, 0.0f);
+	SimpleMath::Vector3 up(0.0f, 1.0f, 0.0f);
 
-	eye = Vector3::Transform(eye, rt.Invert());
+	eye = SimpleMath::Vector3::Transform(eye, rt.Invert());
 	eye *= (DEFAULT_CAMERA_DISTANCE - m_scrollWheelValue / 100);
-	up = Vector3::Transform(up, rt.Invert());
+	up = SimpleMath::Vector3::Transform(up, rt.Invert());
 
 	m_eye = eye;
 	m_target = target;
 
-	m_view = Matrix::CreateLookAt(eye, target, up);
+	m_view = SimpleMath::Matrix::CreateLookAt(eye, target, up);
 }
 
 //--------------------------------------------------------------------------------------

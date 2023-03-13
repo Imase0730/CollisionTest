@@ -28,8 +28,11 @@ namespace Imase
 	{
 	private:
 
-		// 表示可能なコリジョンの最大数
+		// 表示可能なコリジョンの最大数（ディフォルト）
 		static const uint32_t DISPLAY_COLLISION_MAX = 100;
+
+		// 表示可能なコリジョンの最大数
+		uint32_t m_collisionMax;
 
 		// 球の情報
 		struct Sphere
@@ -75,7 +78,11 @@ namespace Imase
 	public:
 
 		// コンストラクタ
-		DisplayCollision(ID3D11Device* device, ID3D11DeviceContext* context);
+		DisplayCollision(
+			ID3D11Device* device,
+			ID3D11DeviceContext* context,
+			uint32_t collisionMax = DISPLAY_COLLISION_MAX
+		);
 
 		// 登録されたコリジョンの描画関数
 		void DrawCollision(

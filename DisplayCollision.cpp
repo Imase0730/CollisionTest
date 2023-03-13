@@ -13,7 +13,11 @@ using namespace DirectX;
 using namespace Imase;
 
 // コンストラクタ
-DisplayCollision::DisplayCollision(ID3D11Device* device, ID3D11DeviceContext* context)
+DisplayCollision::DisplayCollision(
+	ID3D11Device* device,
+	ID3D11DeviceContext* context,
+	uint32_t collisionMax)
+	: m_collisionMax(collisionMax)
 {
 	// モデルの作成（球）
 	m_modelSphere = GeometricPrimitive::CreateSphere(context, 2.0f, 8);
@@ -76,8 +80,8 @@ void DisplayCollision::DrawCollision(
 	DirectX::SimpleMath::Color color)
 {
 	// 登録数が最大表示数を超えていないか？
-	assert(static_cast<uint32_t>(m_spheres.size()) < DISPLAY_COLLISION_MAX);
-	assert(static_cast<uint32_t>(m_boxes.size()) < DISPLAY_COLLISION_MAX);
+	assert(static_cast<uint32_t>(m_spheres.size()) < m_collisionMax);
+	assert(static_cast<uint32_t>(m_boxes.size()) < m_collisionMax);
 
 	// ----- 球のモデルを描画 ----- //
 

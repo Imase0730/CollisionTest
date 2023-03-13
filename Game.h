@@ -8,6 +8,7 @@
 #include "StepTimer.h"
 #include "DisplayCollision.h"
 #include "DebugCamera.h"
+#include "DebugFont.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -70,10 +71,16 @@ private:
 
     std::unique_ptr<Imase::DisplayCollision> m_collision;
 
-    std::unique_ptr<DebugCamera> m_camera;
+    std::unique_ptr<Imase::DebugCamera> m_camera;
 
     std::unique_ptr<DirectX::Model> m_monkeyModel;
 
+    std::unique_ptr<DirectX::DGSLEffectFactory> m_DGSLEffectFactory;
+    std::unique_ptr<DirectX::Model> m_shieldModel;
+
     DirectX::SimpleMath::Vector3 m_pos;
+
+    std::unique_ptr<Imase::DebugFont> m_font;
+    std::unique_ptr<Imase::DebugFont3D> m_font3D;
 
 };
