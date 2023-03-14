@@ -11,6 +11,9 @@
     <Filter Include="FBX">
       <UniqueIdentifier>{c933557e-ba37-4077-a22e-6c0fa74a5a4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImaseLib">
+      <UniqueIdentifier>{926cea7f-798a-4c49-bb40-f3dd56dcc361}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -21,10 +24,16 @@
     <ClInclude Include="DeviceResources.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="DisplayCollision.h" />
-    <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="TaskManager.h" />
-    <ClInclude Include="DebugFont.h" />
+    <ClInclude Include="DebugCamera.h">
+      <Filter>ImaseLib</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugFont.h">
+      <Filter>ImaseLib</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayCollision.h">
+      <Filter>ImaseLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -33,10 +42,16 @@
     <ClCompile Include="DeviceResources.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="DisplayCollision.cpp" />
-    <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="TaskManager.cpp" />
-    <ClCompile Include="DebugFont.cpp" />
+    <ClCompile Include="DebugCamera.cpp">
+      <Filter>ImaseLib</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugFont.cpp">
+      <Filter>ImaseLib</Filter>
+    </ClCompile>
+    <ClCompile Include="DisplayCollision.cpp">
+      <Filter>ImaseLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

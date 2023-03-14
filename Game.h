@@ -65,22 +65,35 @@ private:
 
 private:
 
+    // 共通ステート
     std::unique_ptr<DirectX::CommonStates> m_states;
-    std::unique_ptr<DirectX::Model> m_floorModel;
+
+    // エフェクトファクトリー
     std::unique_ptr<DirectX::EffectFactory> m_EffectFactory;
 
-    std::unique_ptr<Imase::DisplayCollision> m_collision;
+    // 床のモデル
+    std::unique_ptr<DirectX::Model> m_floorModel;
 
-    std::unique_ptr<Imase::DebugCamera> m_camera;
+    // カメラ（デバッグ用）
+    std::unique_ptr<Imase::DebugCamera> m_debugCamera;
 
+    // テスト用モデル
     std::unique_ptr<DirectX::Model> m_monkeyModel;
+
+    // テスト用モデルの表示位置
+    DirectX::SimpleMath::Vector3 m_monkeyPos;
 
     std::unique_ptr<DirectX::DGSLEffectFactory> m_DGSLEffectFactory;
     std::unique_ptr<DirectX::Model> m_shieldModel;
 
-    DirectX::SimpleMath::Vector3 m_pos;
 
+    // コリジョンを可視化するためのオブジェクト（デバッグ用）
+    std::unique_ptr<Imase::DisplayCollision> m_displayCollision;
+
+    // デバッグ用フォント出力オブジェクト
     std::unique_ptr<Imase::DebugFont> m_font;
+
+    // デバッグ用フォント出力オブジェクト（3D版）
     std::unique_ptr<Imase::DebugFont3D> m_font3D;
 
 };

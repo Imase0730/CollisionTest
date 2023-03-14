@@ -118,7 +118,7 @@ void DebugFont3D::Render(
 	invView._42 = 0.0f;
 	invView._43 = 0.0f;
 
-	// エフェクトを適応する
+	// エフェクトにビュー行列と射影行列を設定する
 	m_effect->SetView(view);
 	m_effect->SetProjection(proj);
 
@@ -128,8 +128,10 @@ void DebugFont3D::Render(
 			{
 				// ワールド行列作成
 				SimpleMath::Matrix world = invertY * invView * SimpleMath::Matrix::CreateTranslation(m_strings[i].pos);
+				// エフェクトを適応する
 				m_effect->SetWorld(world);
 				m_effect->Apply(context);
+				// 入力レイアウトを設定する
 				context->IASetInputLayout(m_inputLayout.Get());
 			}
 		);
