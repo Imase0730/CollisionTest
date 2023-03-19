@@ -189,6 +189,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="DisplayCollision.h" />
     <ClInclude Include="DebugFont.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="StepTimer.h" />
     <ClInclude Include="TaskManager.h" />
   </ItemGroup>
@@ -205,6 +206,7 @@
     </ClCompile>
     <ClCompile Include="DisplayCollision.cpp" />
     <ClCompile Include="DebugFont.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="TaskManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +222,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <MeshContentTask Include="FBX\A.fbx" />
     <MeshContentTask Include="FBX\floor.fbx" />
     <MeshContentTask Include="FBX\monkey.fbx" />
     <MeshContentTask Include="FBX\Shield.fbx" />

@@ -9,6 +9,8 @@
 #include "DisplayCollision.h"
 #include "DebugCamera.h"
 #include "DebugFont.h"
+#include "TaskManager.h"
+#include "Player.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -95,5 +97,15 @@ private:
 
     // デバッグ用フォント出力オブジェクト（3D版）
     std::unique_ptr<Imase::DebugFont3D> m_font3D;
+
+    // タスクマネージャー
+    std::unique_ptr<Imase::TaskManager> m_taskManager;
+
+    // プレイヤータスク
+    Player* m_playerTask;
+
+    // 床のモデル
+    std::unique_ptr<DirectX::Model> m_model;
+
 
 };

@@ -34,6 +34,7 @@
     <ClInclude Include="DisplayCollision.h">
       <Filter>ImaseLib</Filter>
     </ClInclude>
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -52,6 +53,7 @@
     <ClCompile Include="DisplayCollision.cpp">
       <Filter>ImaseLib</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -77,6 +79,9 @@
       <Filter>FBX</Filter>
     </MeshContentTask>
     <MeshContentTask Include="FBX\Shield.fbx">
+      <Filter>FBX</Filter>
+    </MeshContentTask>
+    <MeshContentTask Include="FBX\A.fbx">
       <Filter>FBX</Filter>
     </MeshContentTask>
   </ItemGroup>

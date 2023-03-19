@@ -4,6 +4,10 @@
 
 #include "pch.h"
 #include "Game.h"
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <iostream>
 
 extern void ExitGame() noexcept;
 
@@ -12,7 +16,7 @@ using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
 Game::Game() noexcept(false)
-    : m_monkeyPos{}
+    //: m_monkeyPos{}
 {
     m_deviceResources = std::make_unique<DX::DeviceResources>();
     // TODO: Provide parameters for swapchain format, depth/stencil format, and backbuffer count.
@@ -41,6 +45,15 @@ void Game::Initialize(HWND window, int width, int height)
 
     // デバッグカメラの作成
     m_debugCamera = std::make_unique<Imase::DebugCamera>(width, height);
+
+    // タスクマネージャーの作成
+    m_taskManager = std::make_unique<Imase::TaskManager>();
+
+    // プレイヤータスクを登録
+    m_playerTask = m_taskManager->AddTask<Player>(m_deviceResources.get(), m_states.get(), m_model.get());
+
+ /*   m_playerTask->Kill();
+    m_playerTask = nullptr;*/
 }
 
 #pragma region Frame Update
@@ -62,6 +75,9 @@ void Game::Update(DX::StepTimer const& timer)
 
     // TODO: Add your game logic here.
     elapsedTime;
+
+    // タスクの更新
+    m_taskManager->Update(elapsedTime);
 
     // テスト用モデルの表示位置を設定
     m_monkeyPos = SimpleMath::Vector3(2.0f, 1.0f, -3.0f);
@@ -143,6 +159,15 @@ void Game::Render()
     // デバッグ用フォントの描画
     m_font3D->Render(context, m_states.get(), view, proj);
     m_font->Render(m_states.get());
+
+    if (m_playerTask)
+    {
+        m_playerTask->SetViewMatrix(view);
+        m_playerTask->SetProjectionMatrix(proj);
+    }
+
+    // タスクの描画
+    m_taskManager->Render();
 
     m_deviceResources->PIXEndEvent();
 
@@ -256,6 +281,11 @@ void Game::CreateDeviceDependentResources()
     // デバッグ用フォント出力オブジェクトを作成
     m_font = std::make_unique<Imase::DebugFont>(device, context, L"Resources/SegoeUI_18.spritefont");
     m_font3D = std::make_unique<Imase::DebugFont3D>(device, context, L"Resources/SegoeUI_18.spritefont");
+
+    // モデルの読み込み
+    EffectFactory effectFactory(device);
+    m_model = Model::CreateFromCMO(device, L"Resources/A.cmo", effectFactory);
+
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

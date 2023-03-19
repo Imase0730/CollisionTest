@@ -69,7 +69,7 @@ void DebugCamera::Update()
 
 	SimpleMath::Matrix rt = rotY * rotX;
 
-	SimpleMath::Vector3 eye(0.0f, 0.0f, 1.0f);
+	SimpleMath::Vector3 eye(0.0f, 1.0f, 1.0f);
 	SimpleMath::Vector3 target(0.0f, 0.0f, 0.0f);
 	SimpleMath::Vector3 up(0.0f, 1.0f, 0.0f);
 
