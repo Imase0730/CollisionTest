@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <iostream>
+#include <sstream>
 
 extern void ExitGame() noexcept;
 
@@ -99,7 +100,13 @@ void Game::Update(DX::StepTimer const& timer)
 
     // テスト用のフォントを登録
     m_font3D->AddString(L"Monkey", m_monkeyPos, Colors::Yellow, 1.0f);
-    m_font->AddString(L"IMASE", SimpleMath::Vector2(0.0f, 0.0f), Colors::Magenta);
+    //m_font->AddString(L"IMASE", SimpleMath::Vector2(0.0f, 0.0f), Colors::Magenta);
+
+    std::wostringstream oss;
+    oss << "fps:" << m_timer.GetFramesPerSecond();
+    m_font->AddString(oss.str().c_str(), SimpleMath::Vector2(0.0f, 0.0f));
+
+
 
     // デバッグカメラの更新
     m_debugCamera->Update();
@@ -156,10 +163,6 @@ void Game::Render()
     // 登録されたコリジョンの描画
     m_displayCollision->DrawCollision(context, m_states.get(), view, proj);
 
-    // デバッグ用フォントの描画
-    m_font3D->Render(context, m_states.get(), view, proj);
-    m_font->Render(m_states.get());
-
     if (m_playerTask)
     {
         m_playerTask->SetViewMatrix(view);
@@ -168,6 +171,20 @@ void Game::Render()
 
     // タスクの描画
     m_taskManager->Render();
+
+    //m_primitiveBatch->Begin();
+
+    //// 盾のコリジョンを登録
+    //for (size_t i = 0; i < m_shieldModel->meshes.size(); i++)
+    //{
+    //    DX::Draw(m_primitiveBatch.get(), m_shieldModel->meshes[i]->boundingBox);
+    //}
+
+    //m_primitiveBatch->End();
+
+    // デバッグ用フォントの描画
+    m_font3D->Render(context, m_states.get(), view, proj);
+    m_font->Render(m_states.get());
 
     m_deviceResources->PIXEndEvent();
 
@@ -285,6 +302,9 @@ void Game::CreateDeviceDependentResources()
     // モデルの読み込み
     EffectFactory effectFactory(device);
     m_model = Model::CreateFromCMO(device, L"Resources/A.cmo", effectFactory);
+
+    // プリミティブバッチの作成
+    m_primitiveBatch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
 
 }
 

@@ -20,6 +20,13 @@
 #include "Effects.h"
 #include "GeometricPrimitive.h"
 #include "DirectXHelpers.h"
+#include "PrimitiveBatch.h"
+#include "VertexTypes.h"
+
+// ラインの表示をしたい場合は定義してください。
+// DebugDraw.cppとDebugDraw.hが必要になります。
+// https://github.com/microsoft/DirectXTK/wiki/Utilities
+#define _COLLISION_LINE_ON 
 
 namespace Imase
 {
@@ -33,6 +40,12 @@ namespace Imase
 
 		// 表示可能なコリジョンの最大数
 		uint32_t m_collisionMax;
+
+		// モデルの表示
+		bool m_modelActive;
+
+		// ラインの表示
+		bool m_lineActive;
 
 		// 球の情報
 		struct Sphere
@@ -75,12 +88,43 @@ namespace Imase
 		// インスタンス用頂点バッファ
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_instancedVB;
 
+		// プリミティブバッチ（ライン用）
+		std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_primitiveBatch;
+
+		// エフェクト（ライン用）
+		std::unique_ptr<DirectX::BasicEffect> m_lineEffect;
+
+		// 入力レイアウト（ライン用）
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_lineInputLayout;
+
+	private:
+
+		// コリジョンモデルの描画関数
+		void DrawCollisionModel(
+			ID3D11DeviceContext* context,
+			DirectX::CommonStates* states,
+			const DirectX::SimpleMath::Matrix& view,
+			const DirectX::SimpleMath::Matrix& proj,
+			DirectX::FXMVECTOR color
+		);
+
+		// コリジョンラインの描画関数
+		void DrawCollisionLine(
+			ID3D11DeviceContext* context,
+			DirectX::CommonStates* states,
+			const DirectX::SimpleMath::Matrix& view,
+			const DirectX::SimpleMath::Matrix& proj,
+			DirectX::FXMVECTOR color
+		);
+
 	public:
 
 		// コンストラクタ
 		DisplayCollision(
 			ID3D11Device* device,
 			ID3D11DeviceContext* context,
+			bool modelActive = true,
+			bool lineActive = true,
 			uint32_t collisionMax = DISPLAY_COLLISION_MAX
 		);
 
@@ -90,7 +134,9 @@ namespace Imase
 			DirectX::CommonStates* states,
 			const DirectX::SimpleMath::Matrix& view,
 			const DirectX::SimpleMath::Matrix& proj,
-			DirectX::SimpleMath::Color color = DirectX::SimpleMath::Color(1.0f,1.0f,1.0f,0.5f)
+			DirectX::FXMVECTOR baseColor = DirectX::Colors::White,
+			DirectX::FXMVECTOR lineColor = DirectX::XMVECTORF32{ 0.0f, 0.0f, 0.0f, 0.0f },
+			float alpha = 0.5f
 		);
 		
 		// 球のコリジョンを登録する関数
@@ -106,6 +152,12 @@ namespace Imase
 			DirectX::XMFLOAT3 center = box.Center + pos;
 			m_boxes.push_back(Box(center, box.Extents));
 		}
+
+		// コリジョンモデルの表示（ON/OFF）
+		void SetModelActive(bool active) { m_modelActive = active; }
+
+		// コリジョンラインの表示（ON/OFF）
+		void SetLineActive(bool active) { m_lineActive = active; }
 
 	};
 

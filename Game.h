@@ -11,6 +11,7 @@
 #include "DebugFont.h"
 #include "TaskManager.h"
 #include "Player.h"
+#include "DebugDraw.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -106,6 +107,9 @@ private:
 
     // 床のモデル
     std::unique_ptr<DirectX::Model> m_model;
+
+    // プリミティブバッチ
+    std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_primitiveBatch;
 
 
 };

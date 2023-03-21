@@ -9,6 +9,10 @@
 #include "pch.h"
 #include "DisplayCollision.h"
 
+#ifdef _COLLISION_LINE_ON
+#include "DebugDraw.h"
+#endif
+
 using namespace DirectX;
 using namespace Imase;
 
@@ -16,8 +20,12 @@ using namespace Imase;
 DisplayCollision::DisplayCollision(
 	ID3D11Device* device,
 	ID3D11DeviceContext* context,
+	bool modelActive,
+	bool lineActive,
 	uint32_t collisionMax)
-	: m_collisionMax(collisionMax)
+	: m_modelActive(modelActive),
+	m_lineActive(lineActive),
+	m_collisionMax(collisionMax)
 {
 	// モデルの作成（球）
 	m_modelSphere = GeometricPrimitive::CreateSphere(context, 2.0f, 8);
@@ -37,6 +45,13 @@ DisplayCollision::DisplayCollision(
 	m_modelEffect->DisableSpecular();
 	m_modelEffect->EnableDefaultLighting();
 	m_modelEffect->SetWorld(SimpleMath::Matrix::Identity);
+
+	// エフェクトの作成（ライン用）
+	m_lineEffect = std::make_unique<BasicEffect>(device);
+	m_lineEffect->SetVertexColorEnabled(true);
+	m_lineEffect->SetTextureEnabled(false);
+	m_lineEffect->SetLightingEnabled(false);
+	m_lineEffect->SetWorld(SimpleMath::Matrix::Identity);
 
 	// ----- 入力レイアウト ----- //
 
@@ -69,6 +84,17 @@ DisplayCollision::DisplayCollision(
 			m_instancedVB.ReleaseAndGetAddressOf())
 	);
 
+#ifdef _COLLISION_LINE_ON
+	// プリミティブバッチの作成
+	m_primitiveBatch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
+
+	// 入力レイアウトの作成
+	DX::ThrowIfFailed(
+		CreateInputLayoutFromEffect<VertexPositionColor>(device, m_lineEffect.get(),
+			m_lineInputLayout.ReleaseAndGetAddressOf())
+	);
+#endif
+
 }
 
 // 登録されたコリジョンの描画関数
@@ -77,7 +103,35 @@ void DisplayCollision::DrawCollision(
 	CommonStates* states,
 	const SimpleMath::Matrix& view,
 	const SimpleMath::Matrix& proj,
-	DirectX::SimpleMath::Color color)
+	FXMVECTOR baseColor,
+	FXMVECTOR lineColor,
+	float alpha)
+{
+	// 色＋アルファ値
+	SimpleMath::Color color = baseColor;
+	color.w = alpha;
+
+	// コリジョンモデルの描画
+	if (m_modelActive) DrawCollisionModel(context, states, view, proj, color);
+
+#ifdef _COLLISION_LINE_ON
+	// ラインの色を指定している場合
+	SimpleMath::Color c = lineColor;
+	if (c.w != 0.0f) color = lineColor;
+
+	// コリジョンラインの描画
+	if (m_lineActive) DrawCollisionLine(context, states, view, proj, color);
+#else
+	UNREFERENCED_PARAMETER(lineColor);
+#endif
+
+	// 登録された表示情報をクリアする
+	m_spheres.clear();
+	m_boxes.clear();
+}
+
+// コリジョンモデルの描画
+void DisplayCollision::DrawCollisionModel(ID3D11DeviceContext* context, DirectX::CommonStates* states, const DirectX::SimpleMath::Matrix& view, const DirectX::SimpleMath::Matrix& proj, FXMVECTOR color)
 {
 	// 登録数が最大表示数を超えていないか？
 	assert(static_cast<uint32_t>(m_spheres.size()) < m_collisionMax);
@@ -150,10 +204,42 @@ void DisplayCollision::DrawCollision(
 			context->IASetVertexBuffers(1, 1, m_instancedVB.GetAddressOf(), &stride, &offset);
 		}
 	);
-
-	// 登録された表示情報をクリアする
-	m_spheres.clear();
-	m_boxes.clear();
 }
 
+#ifdef _COLLISION_LINE_ON
+// コリジョンラインの描画
+void DisplayCollision::DrawCollisionLine(ID3D11DeviceContext* context, DirectX::CommonStates* states, const DirectX::SimpleMath::Matrix& view, const DirectX::SimpleMath::Matrix& proj, FXMVECTOR color)
+{
+	// ----- ラインを描画 ----- //
 
+	context->OMSetBlendState(states->Opaque(), nullptr, 0xFFFFFFFF);
+	context->OMSetDepthStencilState(states->DepthRead(), 0);
+	context->RSSetState(states->CullNone());
+
+	// エフェクトを適応する
+	m_lineEffect->SetView(view);
+	m_lineEffect->SetProjection(proj);
+	m_lineEffect->Apply(context);
+
+	// 入力レイアウトを設定する
+	context->IASetInputLayout(m_lineInputLayout.Get());
+
+	m_primitiveBatch->Begin();
+
+	// ----- 球のラインを描画 ----- //
+	for (int i = 0; i < m_spheres.size(); i++)
+	{
+		DirectX::BoundingSphere shpere(m_spheres[i].center, m_spheres[i].radius);
+		DX::Draw(m_primitiveBatch.get(), shpere, color);
+	}
+
+	// ----- ボックスのラインを描画 ----- //
+	for (int i = 0; i < m_boxes.size(); i++)
+	{
+		DirectX::BoundingBox box(m_boxes[i].center, m_boxes[i].extents);
+		DX::Draw(m_primitiveBatch.get(), box, color);
+	}
+
+	m_primitiveBatch->End();
+}
+#endif

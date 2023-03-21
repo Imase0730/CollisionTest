@@ -35,6 +35,8 @@
       <Filter>ImaseLib</Filter>
     </ClInclude>
     <ClInclude Include="Player.h" />
+    <ClInclude Include="GridFloor.h" />
+    <ClInclude Include="DebugDraw.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -54,6 +56,8 @@
       <Filter>ImaseLib</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="GridFloor.cpp" />
+    <ClCompile Include="DebugDraw.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
