@@ -7,6 +7,7 @@
 //        DrawCollision関数で表示します。登録された情報は描画後クリアされます。
 //        モデル情報の衝突判定用のコリジョン情報の表示などに使用してください。
 //        ボックスは回転には対応していません。（AABBの衝突判定用）
+//        ※コリジョンの個別の色指定は、描画の高速化のためラインのみ対応しています。
 //
 // Date: 2023.3.8
 // Author: Hideyasu Imase
@@ -52,9 +53,13 @@ namespace Imase
 		{
 			DirectX::SimpleMath::Vector3 center;	// 中心
 			float radius;							// 半径
+			DirectX::SimpleMath::Color lineColor;	// 色（ライン用）
 
-			constexpr Sphere(const DirectX::SimpleMath::Vector3& center, float radius) noexcept
-				: center(center), radius(radius) {}
+			constexpr Sphere(
+				const DirectX::SimpleMath::Vector3& center,
+				float radius,
+				DirectX::SimpleMath::Color lineColor) noexcept
+				: center(center), radius(radius), lineColor(lineColor) {}
 		};
 
 		// ボックスの情報
@@ -62,9 +67,13 @@ namespace Imase
 		{
 			DirectX::SimpleMath::Vector3 center;	// 中心
 			DirectX::SimpleMath::Vector3 extents;	// 各面の中心からの距離.
+			DirectX::SimpleMath::Color lineColor;	// 色（ライン用）
 
-			constexpr Box(const DirectX::SimpleMath::Vector3& center, const DirectX::SimpleMath::Vector3& extents) noexcept
-				: center(center), extents(extents) {}
+			constexpr Box(
+				const DirectX::SimpleMath::Vector3& center,
+				const DirectX::SimpleMath::Vector3& extents,
+				DirectX::SimpleMath::Color lineColor) noexcept
+				: center(center), extents(extents), lineColor(lineColor) {}
 		};
 
 		// 球のコリジョン情報
@@ -140,17 +149,23 @@ namespace Imase
 		);
 		
 		// 球のコリジョンを登録する関数
-		void AddBoundingSphere(DirectX::BoundingSphere shpere, DirectX::SimpleMath::Vector3 pos)
+		void AddBoundingSphere(
+			DirectX::BoundingSphere shpere,
+			DirectX::SimpleMath::Vector3 pos,
+			DirectX::FXMVECTOR lineColor = DirectX::XMVECTORF32{ 0.0f, 0.0f, 0.0f, 0.0f })
 		{
 			DirectX::XMFLOAT3 center = shpere.Center + pos;
-			m_spheres.push_back(Sphere(center, shpere.Radius));
+			m_spheres.push_back(Sphere(center, shpere.Radius, lineColor));
 		}
 
 		// ボックスのコリジョンを登録する関数
-		void AddBoundingBox(DirectX::BoundingBox box, DirectX::SimpleMath::Vector3 pos)
+		void AddBoundingBox(
+			DirectX::BoundingBox box,
+			DirectX::SimpleMath::Vector3 pos,
+			DirectX::FXMVECTOR lineColor = DirectX::XMVECTORF32{ 0.0f, 0.0f, 0.0f, 0.0f })
 		{
 			DirectX::XMFLOAT3 center = box.Center + pos;
-			m_boxes.push_back(Box(center, box.Extents));
+			m_boxes.push_back(Box(center, box.Extents, lineColor));
 		}
 
 		// コリジョンモデルの表示（ON/OFF）

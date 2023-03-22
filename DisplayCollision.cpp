@@ -230,14 +230,18 @@ void DisplayCollision::DrawCollisionLine(ID3D11DeviceContext* context, DirectX::
 	for (int i = 0; i < m_spheres.size(); i++)
 	{
 		DirectX::BoundingSphere shpere(m_spheres[i].center, m_spheres[i].radius);
-		DX::Draw(m_primitiveBatch.get(), shpere, color);
+		SimpleMath::Color lineColor = color;
+		if (m_spheres[i].lineColor.w != 0.0f) lineColor = m_spheres[i].lineColor;
+		DX::Draw(m_primitiveBatch.get(), shpere, lineColor);
 	}
 
 	// ----- ボックスのラインを描画 ----- //
 	for (int i = 0; i < m_boxes.size(); i++)
 	{
 		DirectX::BoundingBox box(m_boxes[i].center, m_boxes[i].extents);
-		DX::Draw(m_primitiveBatch.get(), box, color);
+		SimpleMath::Color lineColor = color;
+		if (m_boxes[i].lineColor.w != 0.0f) lineColor = m_boxes[i].lineColor;
+		DX::Draw(m_primitiveBatch.get(), box, lineColor);
 	}
 
 	m_primitiveBatch->End();
