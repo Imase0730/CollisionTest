@@ -14,11 +14,11 @@ using namespace Imase;
 // 子供タスクリストから指定タスクを削除する関数
 bool TaskConnectInfo::DeleteChildList(Task* task)
 {
-	for (auto it = m_child.begin(); it != m_child.end(); it++)
+	for (auto it = m_children.begin(); it != m_children.end(); it++)
 	{
 		if ((*it) == task)
 		{
-			m_child.erase(it);
+			m_children.erase(it);
 			return true;
 		}
 	}

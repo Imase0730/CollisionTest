@@ -105,6 +105,8 @@ private:
     // プレイヤータスク
     Player* m_playerTask;
 
+    Player* m_playerTask2;
+
     // 床のモデル
     std::unique_ptr<DirectX::Model> m_model;
 

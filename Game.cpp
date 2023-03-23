@@ -53,6 +53,15 @@ void Game::Initialize(HWND window, int width, int height)
     // プレイヤータスクを登録
     m_playerTask = m_taskManager->AddTask<Player>(m_deviceResources.get(), m_states.get(), m_model.get());
 
+    //m_playerTask->UpdateTasks([](Imase::Task* task)
+    //    {
+    //        std::string name = task->GetName();
+    //        std::wostringstream oss;
+    //        oss << "Name:" << name.c_str() << std::endl;
+    //        OutputDebugString(oss.str().c_str());
+    //    }
+    //);
+
  /*   m_playerTask->Kill();
     m_playerTask = nullptr;*/
 }
@@ -168,6 +177,7 @@ void Game::Render()
         m_playerTask->SetViewMatrix(view);
         m_playerTask->SetProjectionMatrix(proj);
     }
+
 
     // タスクの描画
     m_taskManager->Render();

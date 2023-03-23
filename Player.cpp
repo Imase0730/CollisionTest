@@ -17,6 +17,8 @@ Player::Player(
     // ƒ‚ƒfƒ‹‚ÌˆÊ’u‚ðƒ‰ƒ“ƒ_ƒ€‚ÅŒˆ‚ß‚é
     m_pos.x = static_cast<float>(rand() % 100 - 50) / 10.0f;
     m_pos.z = static_cast<float>(rand() % 100 - 50) / 10.0f;
+
+    SetName("Player");
 }
 
 Player::~Player()
@@ -41,6 +43,14 @@ bool Player::Update(float elapsedTime)
         player->ChangeParent(GetTaskManager()->GetRootTask());
         player->SetViewMatrix(*m_view);
         player->SetProjectionMatrix(*m_proj);
+        //this->UpdateTasks([](Imase::Task* task)
+        //    {
+        //        std::string name = task->GetName();
+        //        std::wostringstream oss;
+        //        oss << "Name:" << name.c_str() << std::endl;
+        //        OutputDebugString(oss.str().c_str());
+        //    }
+        //);
     }
     if (m_timer > 300) return false;
 

@@ -10,6 +10,7 @@
 
 #include <list>
 #include <set>
+#include <sstream>
 
 namespace Imase
 {
@@ -31,16 +32,16 @@ namespace Imase
 		Task* m_parent;
 
 		// 子供タスクのリスト
-		std::list<Task*> m_child;
+		std::list<Task*> m_children;
 
 	public:
 		TaskConnectInfo() : m_taskManager{}, m_parent{} {}
 		TaskManager* GetTaskManager() const { return m_taskManager; }
 		Task* GetParent() const { return m_parent; }
-		std::list<Task*>* GetChildList() { return &m_child; }
+		std::list<Task*>* GetChildList() { return &m_children; }
 		void SetTaskManager(TaskManager* taskManager) { m_taskManager = taskManager; }
 		void SetParent(Task* task) { m_parent = task; }
-		void AddChild(Task* task) { m_child.push_back(task); }
+		void AddChild(Task* task) { m_children.push_back(task); }
 		bool DeleteChildList(Task* task);
 	};
 
@@ -58,12 +59,19 @@ namespace Imase
 		// タスク連結情報
 		TaskConnectInfo m_connect;
 
+		// タスクの名前
+		std::string m_name;
+
 	public:
 
 		TaskConnectInfo& GetTaskConnectInfo() { return m_connect; }
 
 	public:
+
+		// コンストラクタ
 		Task() : m_ot(0) {}
+
+		// デストラクタ
 		virtual ~Task() {}
 
 		//////////////////////////////////////////
@@ -71,14 +79,19 @@ namespace Imase
 		//	オーバーライドして使う関数			//
 		//										//
 		//////////////////////////////////////////
+
+		// 更新関数（falseを返すとタスクが消える）
 		virtual bool Update(float elapsedTime)
 		{
 			UNREFERENCED_PARAMETER(elapsedTime);
 			return true;
 		}
+
+		// 描画関数
 		virtual void Render() {}
 
 	public:
+
 		// タスクマネージャーの取得関数
 		TaskManager* GetTaskManager() const { return m_connect.GetTaskManager(); }
 
@@ -93,6 +106,23 @@ namespace Imase
 
 		// 指定したタスクの子供にする変更する関数
 		void ChangeParent(Task* parent);
+
+		// タスクに名前を付ける関数
+		void SetName(const std::string& name) { m_name = name; }
+
+		// タスクの名前を取得する関数
+		const std::string& GetName() { return m_name; }
+
+		// タスク更新関数（子供のタスクまでタスク更新関数が呼び出される）
+		void UpdateTasks(std::function<void(Task*)> func)
+		{
+			func(this);
+			std::list<Task*>* children = GetTaskConnectInfo().GetChildList();
+			for (const auto it : *children)
+			{
+				it->UpdateTasks(func);
+			}
+		}
 
 	};
 
@@ -129,13 +159,19 @@ namespace Imase
 
 		// 子供タスクの更新関数を実行する関数
 		void ChildTaskUpdate(Task* task, float elapsedTime);
+
+		// タスク生成数
+		uint64_t m_totalTaskCnt;
+
 #pragma endregion
 
 	public:
+
 		// コンストラクタ
-		TaskManager() : m_rootTask{}, m_currentTask {}
+		TaskManager() : m_rootTask{}, m_currentTask{}, m_totalTaskCnt{}
 		{
 			m_currentTask = m_rootTask = new Task();
+			m_rootTask->SetName("RootTask");
 		}
 
 		// デストラクタ
@@ -175,6 +211,17 @@ namespace Imase
 
 		// 親の子供リストに追加
 		m_currentTask->GetTaskConnectInfo().AddChild(task);
+
+		// タスクに名前が付いていない場合は仮で名前を付ける
+		if (task->GetName().empty())
+		{
+			std::ostringstream ostr;
+			ostr << "Task_" << m_totalTaskCnt;
+			task->SetName(ostr.str());
+		}
+
+		// タスク生成数を加算
+		m_totalTaskCnt++;
 
 		return task;
 	}
