@@ -72,7 +72,7 @@ namespace Imase
 		Task() : m_ot(0) {}
 
 		// デストラクタ
-		virtual ~Task() {}
+		virtual ~Task() = default;
 
 		//////////////////////////////////////////
 		//										//
